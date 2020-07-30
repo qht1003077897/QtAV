@@ -101,6 +101,19 @@ void OpenGLRendererBase::drawFrame()
     d.glv.render(QRectF(), roi, d.matrix);
 }
 
+void OpenGLRendererBase::setVertexData(float *arrayVdata, int arrayVdataSize)
+{
+     qDebug()<< "QHT  OpenGLRendererBase::setVertexData:" << arrayVdata << "arrayVdataSize:" << arrayVdataSize;
+     DPTR_D(OpenGLRendererBase);
+     d.glv.setVertexData(arrayVdata, arrayVdataSize);
+}
+
+void OpenGLRendererBase::openFold(int foldSize)
+{
+    qDebug()<< "QHT OpenGLRendererBase::openFold--" <<"openFold:" << foldSize;
+    DPTR_D(OpenGLRendererBase);
+    d.glv.openFold(foldSize);
+}
 void OpenGLRendererBase::onInitializeGL()
 {
     DPTR_D(OpenGLRendererBase);

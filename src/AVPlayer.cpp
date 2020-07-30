@@ -1117,6 +1117,24 @@ void AVPlayer::setState(State value)
 
 }
 
+void AVPlayer::setVertexData(float *arrayVdata, int arrayVdataSize)
+{
+    auto outs = videoOutputs();
+    qDebug()<< "QHT AVPlayer::setVertexData:" << arrayVdata << "arrayVdataSize:" << arrayVdataSize;
+    qDebug()<< "QHT AVPlayer::setVertexData:" << "outs.size():" << outs.size();
+    for (auto output : outs) {
+        output->setVertexData(arrayVdata,arrayVdataSize);
+    }
+}
+
+void AVPlayer::openFold(int foldSize)
+{
+    auto outs = videoOutputs();
+    qDebug()<< "QHT AVPlayer::openFold:" <<"foldSize:" << foldSize << "outs.size():" << outs.size();
+    for (auto output : outs) {
+        output->openFold(foldSize);
+    }
+}
 bool AVPlayer::load()
 {
     if (!d->current_source.isValid()) {

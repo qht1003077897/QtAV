@@ -204,6 +204,10 @@ public:
      * Currently you can only use it to set custom shader OpenGLVideo.setUserShader()
      */
     virtual OpenGLVideo* opengl() const { return NULL;}
+    //QHT insert
+    virtual void setVertexData(float *arrayVdata, int arrayVdataSize){};
+    /*打开打折功能，需要调用setVertexData设置顶点数据和纹理数据（交叉格式）*/
+    virtual void openFold(int foldSize){};
 protected:
     VideoRenderer(VideoRendererPrivate &d);
     //TODO: batch drawBackground(color, region)=>loop drawBackground(color,rect)

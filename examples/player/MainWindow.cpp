@@ -160,6 +160,31 @@ void MainWindow::initPlayer()
         QMessageBox::critical(0, QString::fromLatin1("QtAV"), tr("Video renderer is ") + tr("not availabe on your platform!"));
     }
     setRenderer(vo);
+    static GLfloat vertexVertices[] = {
+    // 顶点从左下角逆时针旋转
+    // 左上角区域
+     -1.0f,  0.0f,     0.0f, 1 - 0.5f,
+     0.0f,  0.0f,     0.5f, 1 - 0.5f,
+     0.0f,  1.0f,     0.5f, 1 - 1.0f,
+     -1.0f,  1.0f,     0.0f, 1 - 1.0f,
+     // 右上角区域
+     0.2f, 0.2f,       0.5f, 1 - 0.5f,
+     1.0f, 0.2f,       1.0f, 1 - 0.5f,
+     1.0f, 1.0f,       1.0f, 1 - 1.0f,
+     0.2f, 1.0f,       0.5f, 1 - 1.0f,
+     // 左下角区域
+     -1.0f,  -1.0f,  0.0f, 1 - (0.5f - 0.5f),
+     0.0f,  -1.0f,  0.5f, 1 - (0.5f - 0.5f),
+     0.0f,  -0.2f,  0.5f, 1 - (1.0f - 0.5f),
+     -1.0f,  -0.2f,  0.0f, 1 - (1.0f - 0.5f),
+     // 右下角区域
+     0.2f, -1.0f,    0.5f,  1 - (0.5f - 0.5f),
+     1.0f, -1.0f,    1.0f,  1 - (0.5f - 0.5f),
+     1.0f, 0.0f,     1.0f,  1 - (1.0f - 0.5f),
+     0.2f, 0.0f,     0.5f,  1 - (1.0f - 0.5f),
+     };
+    //mpPlayer->openFold(4);
+    //mpPlayer->setVertexData(vertexVertices,sizeof(vertexVertices));
     //mpSubtitle->installTo(mpPlayer); //filter on frame
     mpSubtitle->setPlayer(mpPlayer);
     //mpPlayer->setAudioOutput(AudioOutputFactory::create(AudioOutputId_OpenAL));

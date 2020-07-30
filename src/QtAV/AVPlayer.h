@@ -268,6 +268,10 @@ public:
     State state() const;
     void setState(State value);
 
+    //QHT insert
+    void setVertexData(float *arrayVdata, int arrayVdataSize);
+    /*打开打折功能，需要调用setVertexData设置顶点数据和纹理数据（交叉格式）*/
+    void openFold(int foldSize);
     // TODO: use id as parameter and return ptr?
     void addVideoRenderer(VideoRenderer *renderer);
     void removeVideoRenderer(VideoRenderer *renderer);
