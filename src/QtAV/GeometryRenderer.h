@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
     QtAV:  Multimedia framework based on Qt and FFmpeg
     Copyright (C) 2012-2017 Wang Bin <wbsecg1@gmail.com>
 
@@ -57,6 +57,10 @@ public:
     int features() const;
     int actualFeatures() const;
     bool testFeatures(int value) const;
+    //QHT insert
+    void setVertexData(float *arrayVdata, int arrayVdataSize);
+    /*打开打折功能，需要调用setVertexData设置顶点数据和纹理数据（交叉格式）*/
+    void openFold(int foldSize);
     /*!
      * \brief updateGeometry
      * Update geometry buffer. Rebind VBO, IBO to VAO if geometry attributes is changed.
@@ -66,11 +70,15 @@ public:
      */
     void updateGeometry(Geometry* geo = NULL);
     virtual void render();
+    int m_foldSize = 0;
+    bool m_bIsFold = false;
+    int m_arrayVdataSize = 0;
+    float *m_arrayVdata = nullptr;
 protected:
     void bindBuffers();
     void unbindBuffers();
 private:
-    Geometry *g;
+    Geometry *g = nullptr;
     int features_;
     int vbo_size, ibo_size; // QOpenGLBuffer.size() may get error 0x501
     QOpenGLBuffer vbo; //VertexBuffer

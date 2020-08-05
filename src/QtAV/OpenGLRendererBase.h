@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
     QtAV:  Multimedia framework based on Qt and FFmpeg
     Copyright (C) 2012-2016 Wang Bin <wbsecg1@gmail.com>
 
@@ -48,6 +48,10 @@ public:
     virtual ~OpenGLRendererBase();
     bool isSupported(VideoFormat::PixelFormat pixfmt) const Q_DECL_OVERRIDE;
     OpenGLVideo* opengl() const Q_DECL_OVERRIDE;
+    //QHT insert
+    void setVertexData(float *arrayVdata, int arrayVdataSize)Q_DECL_OVERRIDE;
+    /*打开打折功能，需要调用setVertexData设置顶点数据和纹理数据（交叉格式）*/
+    void openFold(int foldSize)Q_DECL_OVERRIDE;
 protected:
     virtual bool receiveFrame(const VideoFrame& frame) Q_DECL_OVERRIDE;
     //called in paintEvent before drawFrame() when required

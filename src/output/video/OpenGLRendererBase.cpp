@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
     QtAV:  Multimedia framework based on Qt and FFmpeg
     Copyright (C) 2012-2017 Wang Bin <wbsecg1@gmail.com>
 
@@ -99,6 +99,20 @@ void OpenGLRendererBase::drawFrame()
         d.frame_changed = false;
     }
     d.glv.render(QRectF(), roi, d.matrix);
+}
+
+void OpenGLRendererBase::setVertexData(float *arrayVdata, int arrayVdataSize)
+{
+     qDebug()<< "QHT  OpenGLRendererBase::setVertexData:" << arrayVdata << "arrayVdataSize:" << arrayVdataSize;
+     DPTR_D(OpenGLRendererBase);
+     d.glv.setVertexData(arrayVdata, arrayVdataSize);
+}
+
+void OpenGLRendererBase::openFold(int foldSize)
+{
+    qDebug()<< "QHT OpenGLRendererBase::openFold--" <<"openFold:" << foldSize;
+    DPTR_D(OpenGLRendererBase);
+    d.glv.openFold(foldSize);
 }
 
 void OpenGLRendererBase::onInitializeGL()

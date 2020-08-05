@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
     QtAV:  Multimedia framework based on Qt and FFmpeg
     Copyright (C) 2012-2017 Wang Bin <wbsecg1@gmail.com>
 
@@ -80,6 +80,22 @@ bool GeometryRenderer::testFeatures(int value) const
     return !!(features() & value);
 }
 
+void GeometryRenderer::setVertexData(float *arrayVdata, int arrayVdataSize)
+{
+    qDebug()<< "QHT GeometryRenderer::setVertexData--" << arrayVdata << "arrayVdataSize:" << arrayVdataSize;
+    qDebug()<< "QHT GeometryRenderer::setVertexData~~~~~~~~~~~~~" << (void*)this;
+    m_arrayVdataSize = arrayVdataSize;
+    m_arrayVdata = arrayVdata;
+    m_bIsFold = true;
+    qDebug()<< "QHT GeometryRenderer::end";
+}
+
+void GeometryRenderer::openFold(int foldSize)
+{
+    qDebug()<< "QHT GeometryRenderer::openFold--" << "foldSize:" << foldSize;
+    m_foldSize = foldSize;
+}
+
 void GeometryRenderer::updateGeometry(Geometry *geo)
 {
     g = geo;
@@ -152,7 +168,14 @@ void GeometryRenderer::updateGeometry(Geometry *geo)
                 vbo_size = bs;
             }
         } else {
-            vbo.allocate(g->vertexData(), bs);
+            qDebug()<< "GeometryRenderer::m_bIsFold:" << m_bIsFold;
+                if(m_bIsFold)
+                {
+                    qDebug()<< "GeometryRenderer::m_arrayVdata:" << m_arrayVdata << "m_arrayVdataSize:"<< m_arrayVdataSize;
+                    vbo.allocate(m_arrayVdata, m_arrayVdataSize);
+                }else {
+                    vbo.allocate(g->vertexData(), bs);
+                }
         }
         vbo.release();
     }
@@ -177,11 +200,20 @@ void GeometryRenderer::updateGeometry(Geometry *geo)
     // call once is enough if no feature and no geometry attribute is changed
     if (vbo.isCreated()) {
         vbo.bind();
+        qDebug()<< "GeometryRenderer::updateGeometry:" << m_arrayVdata << "m_bIsFold:"<< m_bIsFold;
+        if(m_bIsFold)
+        {
+            QGLF(glVertexAttribPointer(0, 2, GL_FLOAT, 0, 4 * sizeof(float) , reinterpret_cast<const void *>(qptrdiff(0)))); //TODO: in setActiveShader
+            QGLF(glEnableVertexAttribArray(0));
+            QGLF(glVertexAttribPointer(1, 2,GL_FLOAT, 0, 4 * sizeof(float) , reinterpret_cast<const void *>(qptrdiff(2*sizeof(float))))); //TODO: in setActiveShader
+            QGLF(glEnableVertexAttribArray(1));
+        }else {
         for (int an = 0; an < g->attributes().size(); ++an) {
             // FIXME: assume bind order is 0,1,2...
             const Attribute& a = g->attributes().at(an);
             QGLF(glVertexAttribPointer(an, a.tupleSize(), a.type(), a.normalize(), g->stride(), reinterpret_cast<const void *>(qptrdiff(a.offset())))); //TODO: in setActiveShader
             QGLF(glEnableVertexAttribArray(an));
+             }
         }
         vbo.release(); // unbind after vao unbind? http://www.zwqxin.com/archives/opengl/vao-and-vbo-stuff.html
     } // TODO: bind pointers if vbo is disabled
@@ -269,7 +301,16 @@ void GeometryRenderer::render()
     if (g->indexCount() > 0) {
         DYGL(glDrawElements(g->primitive(), g->indexCount(), g->indexType(), ibo.isCreated() ? NULL : g->indexData())); // null: data in vao or ibo. not null: data in memory
     } else {
-        DYGL(glDrawArrays(g->primitive(), 0, g->vertexCount()));
+        if(m_bIsFold)
+        {
+            for (int i = 0; i < m_foldSize; i++)
+                {
+                    DYGL(glDrawArrays(GL_TRIANGLE_FAN,  4 * i, 4));
+                }
+        }else {
+            // GL_TRIANGLE_STRIP  g->vertexCount: 4
+            DYGL(glDrawArrays(g->primitive(), 0, g->vertexCount()));
+        }
     }
     unbindBuffers();
 }

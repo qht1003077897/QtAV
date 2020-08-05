@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
     QtAV:  Multimedia framework based on Qt and FFmpeg
     Copyright (C) 2012-2018 Wang Bin <wbsecg1@gmail.com>
 
@@ -80,6 +80,19 @@ public:
             material = 0;
         }
     }
+    void setVertexData(float *arrayVdata, int arrayVdataSize)
+    {
+        qDebug()<< "QHT OpenGLVideoPrivate::setVertexData--" << arrayVdata << "arrayVdataSize:" << arrayVdataSize;
+        m_arrayVdataSize = arrayVdataSize;
+        m_arrayVdata = arrayVdata;
+    }
+
+    void openFold(int foldSize)
+    {
+        qDebug()<< "QHT OpenGLVideoPrivate::openFold--" << "foldSize:" << foldSize;
+        m_foldSize = foldSize;
+        m_bIsFold = true;
+    }
     // update geometry(vertex array) set attributes or bind VAO/VBO.
     void updateGeometry(VideoShader* shader, const QRectF& t, const QRectF& r);
 public:
@@ -96,11 +109,16 @@ public:
     QRectF target;
     QRectF roi; //including invalid padding width
     OpenGLVideo::MeshType mesh_type;
-    TexturedGeometry *geometry;
-    GeometryRenderer* gr;
+    TexturedGeometry *geometry = nullptr;
+    GeometryRenderer* gr = nullptr;
     QRectF rect;
     QMatrix4x4 matrix;
     VideoShader *user_shader;
+private:
+    int m_foldSize = 0;
+    bool m_bIsFold = false;
+    int m_arrayVdataSize = 0;
+    float *m_arrayVdata = nullptr;
 };
 
 void OpenGLVideoPrivate::updateGeometry(VideoShader* shader, const QRectF &t, const QRectF &r)
@@ -128,6 +146,11 @@ void OpenGLVideoPrivate::updateGeometry(VideoShader* shader, const QRectF &t, co
         new_thread.setLocalData(false);
         GeometryRenderer *r = new GeometryRenderer(); // local var is captured by lambda 
         gr = r;
+        if(m_bIsFold)
+        {
+            gr->setVertexData(m_arrayVdata,m_arrayVdataSize);
+            gr->openFold(m_foldSize);
+        }
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && defined(Q_COMPILER_LAMBDA)
         QObject::connect(QOpenGLContext::currentContext(), &QOpenGLContext::aboutToBeDestroyed, [r]{
             qDebug("destroy GeometryRenderer %p", r);
@@ -333,6 +356,18 @@ void OpenGLVideo::setMeshType(MeshType value)
 OpenGLVideo::MeshType OpenGLVideo::meshType() const
 {
     return d_func().mesh_type;
+}
+
+void OpenGLVideo::openFold(int foldSize)
+{
+     qDebug()<< "QHT OpenGLVideo::openFold-- " << "foldSize:" << foldSize;
+     d_func().openFold(foldSize);
+}
+
+void OpenGLVideo::setVertexData(float *arrayVdata, int arrayVdataSize)
+{
+    qDebug()<< "QHT OpenGLVideo::setVertexData:" << arrayVdata << "arrayVdataSize:" << arrayVdataSize;
+    d_func().setVertexData(arrayVdata,arrayVdataSize);
 }
 
 void OpenGLVideo::fill(const QColor &color)

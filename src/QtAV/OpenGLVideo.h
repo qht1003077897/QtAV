@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
     QtAV:  Multimedia framework based on Qt and FFmpeg
     Copyright (C) 2012-2018 Wang Bin <wbsecg1@gmail.com>
 
@@ -99,6 +99,11 @@ public:
 
     void setMeshType(MeshType value);
     MeshType meshType() const;
+
+    //QHT insert
+    /*打开打折功能，需要调用setVertexData设置顶点数据和纹理数据（交叉格式）*/
+    void openFold(int foldSize);
+    void setVertexData(float *arrayVdata, int arrayVdataSize);
 Q_SIGNALS:
     void beforeRendering();
     /*!
