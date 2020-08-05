@@ -109,8 +109,8 @@ public:
     QRectF target;
     QRectF roi; //including invalid padding width
     OpenGLVideo::MeshType mesh_type;
-    TexturedGeometry *geometry = nullptr;
-    GeometryRenderer* gr = nullptr;
+    TexturedGeometry *geometry;
+    GeometryRenderer* gr;
     QRectF rect;
     QMatrix4x4 matrix;
     VideoShader *user_shader;
@@ -139,12 +139,12 @@ void OpenGLVideoPrivate::updateGeometry(VideoShader* shader, const QRectF &t, co
     static QThreadStorage<bool> new_thread;
     if (!new_thread.hasLocalData())
         new_thread.setLocalData(true);
-    
+
     update_gr = new_thread.localData();
     if (!gr || update_gr) { // TODO: only update VAO, not the whole GeometryRenderer
         update_geo = true;
         new_thread.setLocalData(false);
-        GeometryRenderer *r = new GeometryRenderer(); // local var is captured by lambda 
+        GeometryRenderer *r = new GeometryRenderer(); // local var is captured by lambda
         gr = r;
         if(m_bIsFold)
         {
