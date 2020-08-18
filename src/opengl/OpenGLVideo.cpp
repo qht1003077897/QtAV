@@ -33,7 +33,7 @@
 #include "QtAV/GeometryRenderer.h"
 #include "opengl/OpenGLHelper.h"
 #include "utils/Logger.h"
-
+#include <QOffscreenSurface>
 namespace QtAV {
 
 // FIXME: why crash if inherits both QObject and DPtrPrivate?
@@ -241,7 +241,16 @@ void OpenGLVideo::setOpenGLContext(QOpenGLContext *ctx)
     // TODO: what if ctx is delete?
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     d.manager = new ShaderManager(ctx);
-    QObject::connect(ctx, SIGNAL(aboutToBeDestroyed()), this, SLOT(resetGL()), Qt::DirectConnection); // direct to make sure there is a valid context. makeCurrent in window.aboutToBeDestroyed()?
+    QObject::connect(ctx, &QOpenGLContext::aboutToBeDestroyed, [this,ctx] {
+            qDebug("QHT aboutToBeDestroyed resetGL begin");
+            QOffscreenSurface s;
+            s.create();
+            ctx->makeCurrent(&s);
+            resetGL();// it's better to cleanup gl renderer resources
+            ctx->doneCurrent();
+            qDebug("QHT aboutToBeDestroyed resetGL end");
+        });
+    //QObject::connect(ctx, SIGNAL(aboutToBeDestroyed()), this, SLOT(resetGL()), Qt::DirectConnection); // direct to make sure there is a valid context. makeCurrent in window.aboutToBeDestroyed()?
 #else
     d.manager = new ShaderManager(this);
 #endif
