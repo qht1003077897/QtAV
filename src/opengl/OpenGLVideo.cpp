@@ -60,7 +60,8 @@ public:
             delete material;
             material = 0;
         }
-        delete geometry;
+        if(geometry)
+         delete geometry;
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0) || !defined(Q_COMPILER_LAMBDA)
         delete gr;
 #endif
@@ -96,9 +97,9 @@ public:
     // update geometry(vertex array) set attributes or bind VAO/VBO.
     void updateGeometry(VideoShader* shader, const QRectF& t, const QRectF& r);
 public:
-    QOpenGLContext *ctx;
-    ShaderManager *manager;
-    VideoMaterial *material;
+    QOpenGLContext *ctx = nullptr;
+    ShaderManager *manager = nullptr;
+    VideoMaterial *material = nullptr;
     qint64 material_type;
     bool norm_viewport;
     bool has_a;
@@ -109,11 +110,11 @@ public:
     QRectF target;
     QRectF roi; //including invalid padding width
     OpenGLVideo::MeshType mesh_type;
-    TexturedGeometry *geometry;
-    GeometryRenderer* gr;
+    TexturedGeometry *geometry = nullptr;
+    GeometryRenderer* gr = nullptr;
     QRectF rect;
     QMatrix4x4 matrix;
-    VideoShader *user_shader;
+    VideoShader *user_shader = nullptr;
 private:
     int m_foldSize = 0;
     bool m_bIsFold = false;
@@ -241,15 +242,16 @@ void OpenGLVideo::setOpenGLContext(QOpenGLContext *ctx)
     // TODO: what if ctx is delete?
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     d.manager = new ShaderManager(ctx);
-    QObject::connect(ctx, &QOpenGLContext::aboutToBeDestroyed, [this,ctx] {
+    QObject::connect(ctx, &QOpenGLContext::aboutToBeDestroyed, this,[this,ctx] {
             qDebug("QHT aboutToBeDestroyed resetGL begin");
             QOffscreenSurface s;
             s.create();
             ctx->makeCurrent(&s);
+            d_func().resetGL();
             resetGL();// it's better to cleanup gl renderer resources
             ctx->doneCurrent();
             qDebug("QHT aboutToBeDestroyed resetGL end");
-        });
+        }, Qt::DirectConnection);
     //QObject::connect(ctx, SIGNAL(aboutToBeDestroyed()), this, SLOT(resetGL()), Qt::DirectConnection); // direct to make sure there is a valid context. makeCurrent in window.aboutToBeDestroyed()?
 #else
     d.manager = new ShaderManager(this);
