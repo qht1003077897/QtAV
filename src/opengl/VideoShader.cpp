@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
     QtAV:  Multimedia framework based on Qt and FFmpeg
     Copyright (C) 2012-2016 Wang Bin <wbsecg1@gmail.com>
 
@@ -948,6 +948,7 @@ bool VideoMaterialPrivate::initTexture(GLuint tex, GLint internal_format, GLenum
 
 VideoMaterialPrivate::~VideoMaterialPrivate()
 {
+    qWarning("QHT ~VideoMaterialPrivate");
     // FIXME: when to delete
     if (!QOpenGLContext::currentContext()) {
         qWarning("No gl context");
@@ -955,9 +956,14 @@ VideoMaterialPrivate::~VideoMaterialPrivate()
     }
     if (!textures.isEmpty()) {
         for (int i = 0; i < textures.size(); ++i) {
+            qWarning("QHT  for glDeleteTextures");
             GLuint &tex = textures[i];
             if (owns_texture[tex])
-                DYGL(glDeleteTextures(1, &tex));
+            {
+                 DYGL(glDeleteTextures(1, &tex));
+                 qWarning("QHT  glDeleteTextures");
+            }
+
         }
         //DYGL(glDeleteTextures(textures.size(), textures.data()));
     }
