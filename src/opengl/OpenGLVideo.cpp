@@ -252,18 +252,18 @@ void OpenGLVideo::setOpenGLContext(QOpenGLContext *ctx)
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     d.manager = new ShaderManager(ctx);
     qDebug("QObject::connect(ctx, &QOpenGLContext::aboutToBeDestroyed  resetGL");
-//    QObject::connect(ctx, &QOpenGLContext::aboutToBeDestroyed,[this,ctx] {
-//            qWarning("QHT aboutToBeDestroyed resetGL begin");
-//            qWarning("QHT ----------------------1");
-//            QOffscreenSurface s;
-//            s.create();
-//            ctx->makeCurrent(&s);
-//            qWarning("QHT ----------------------1.5");
-//            resetGL();
-//            ctx->doneCurrent();
-//            qWarning("QHT ----------------------2");
-//            qWarning("QHT aboutToBeDestroyed resetGL end");
-//        });
+    QObject::connect(ctx, &QOpenGLContext::aboutToBeDestroyed,this,[this,ctx] {
+            qWarning("QHT aboutToBeDestroyed resetGL begin");
+            qWarning("QHT ----------------------1");
+            QOffscreenSurface s;
+            s.create();
+            ctx->makeCurrent(&s);
+            qWarning("QHT ----------------------1.5");
+            resetGL();
+            ctx->doneCurrent();
+            qWarning("QHT ----------------------2");
+            qWarning("QHT aboutToBeDestroyed resetGL end");
+        },Qt::DirectConnection);
     //QObject::connect(QOpenGLContext::currentContext(), SIGNAL(aboutToBeDestroyed()), this, SLOT(resetGL()), Qt::DirectConnection); // direct to make sure there is a valid context. makeCurrent in window.aboutToBeDestroyed()?
 #else
     d.manager = new ShaderManager(this);

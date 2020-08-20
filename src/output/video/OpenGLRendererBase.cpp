@@ -39,6 +39,7 @@ OpenGLRendererBasePrivate::OpenGLRendererBasePrivate(QPaintDevice* pd)
 }
 
 OpenGLRendererBasePrivate::~OpenGLRendererBasePrivate() {
+    qWarning("QHT OpenGLRendererBasePrivate::~OpenGLRendererBasePrivate()");
     if (painter) {
         delete painter;
         painter = 0;
