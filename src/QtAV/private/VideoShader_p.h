@@ -136,6 +136,7 @@ public:
     void uploadPlane(int p, bool updateTexture = true);
     bool ensureResources();
     bool ensureTextures();
+    void deleteTextures();//QHT insert
     void setupQuality();
 
     bool update_texure; // reduce upload/map times. true: new frame not bound. false: current frame is bound

@@ -39,6 +39,7 @@ OpenGLRendererBasePrivate::OpenGLRendererBasePrivate(QPaintDevice* pd)
 }
 
 OpenGLRendererBasePrivate::~OpenGLRendererBasePrivate() {
+    qWarning("QHT OpenGLRendererBasePrivate::~OpenGLRendererBasePrivate()");
     if (painter) {
         delete painter;
         painter = 0;
@@ -61,6 +62,7 @@ OpenGLRendererBase::OpenGLRendererBase(OpenGLRendererBasePrivate &d)
 
 OpenGLRendererBase::~OpenGLRendererBase()
 {
+   qDebug("QHT ~OpenGLRendererBase()");
    d_func().glv.setOpenGLContext(0);
 }
 

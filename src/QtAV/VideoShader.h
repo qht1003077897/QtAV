@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
     QtAV:  Multimedia framework based on Qt and FFmpeg
     Copyright (C) 2012-2016 Wang Bin <wbsecg1@gmail.com>
 
@@ -190,6 +190,7 @@ public:
 
     bool bind(); // TODO: roi
     void unbind();
+    void deleteTextures();//QHT
     int compare(const VideoMaterial* other) const;
 
     int textureTarget() const;

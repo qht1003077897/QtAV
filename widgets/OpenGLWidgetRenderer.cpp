@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
     QtAV:  Multimedia framework based on Qt and FFmpeg
     Copyright (C) 2012-2016 Wang Bin <wbsecg1@gmail.com>
 
@@ -38,6 +38,11 @@ public:
 VideoRendererId OpenGLWidgetRenderer::id() const
 {
     return VideoRendererId_OpenGLWidget;
+}
+
+OpenGLWidgetRenderer::~OpenGLWidgetRenderer()
+{
+      qWarning("QHT OpenGLWidgetRenderer::~OpenGLWidgetRenderer()");
 }
 
 OpenGLWidgetRenderer::OpenGLWidgetRenderer(QWidget *parent, Qt::WindowFlags f):
