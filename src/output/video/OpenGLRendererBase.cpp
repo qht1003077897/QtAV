@@ -61,6 +61,7 @@ OpenGLRendererBase::OpenGLRendererBase(OpenGLRendererBasePrivate &d)
 
 OpenGLRendererBase::~OpenGLRendererBase()
 {
+   qDebug("QHT ~OpenGLRendererBase()");
    d_func().glv.setOpenGLContext(0);
 }
 

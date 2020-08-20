@@ -691,6 +691,38 @@ void VideoMaterial::unbind()
     setDirty(false);
 }
 
+void VideoMaterial::deleteTextures()
+{
+    d_func().deleteTextures();
+}
+
+void VideoMaterialPrivate::deleteTextures()
+{
+    qDebug("QHT deleteTextures");
+    // FIXME: when to delete
+    if (!QOpenGLContext::currentContext()) {
+        qDebug("QHT deleteTextures No gl context");
+        return;
+    }
+    const int nb_planes = video_format.planeCount();
+    for (int p = 0; p < nb_planes; ++p) {
+        GLuint &tex = textures[p];
+        if (tex) { // can be 0 if resized to a larger size
+            qDebug("QHT try to delete texture for plane %d (id=%u). can delete: %d", p, tex, owns_texture[tex]);
+            if (owns_texture[tex])
+            {
+                qDebug("QHT qht glDeleteTextures1");
+                DYGL(glDeleteTextures(1, &tex));
+                qDebug("QHT qht glDeleteTextures2");
+            }
+            owns_texture.remove(tex);
+            tex = 0;
+        }
+    }
+    owns_texture.clear();
+     qDebug("QHT qht VideoMaterialPrivate::deleteTextures end");
+}
+
 int VideoMaterial::compare(const VideoMaterial *other) const
 {
     DPTR_D(const VideoMaterial);

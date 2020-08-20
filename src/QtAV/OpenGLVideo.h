@@ -59,6 +59,7 @@ public:
     };
     static bool isSupported(VideoFormat::PixelFormat pixfmt);
     OpenGLVideo();
+    ~OpenGLVideo();
     /*!
      * \brief setOpenGLContext
      * a context must be set before renderering.
@@ -104,6 +105,7 @@ public:
     /*打开打折功能，需要调用setVertexData设置顶点数据和纹理数据（交叉格式）*/
     void openFold(int foldSize);
     void setVertexData(float *arrayVdata, int arrayVdataSize);
+    void deleteTextures();//QHT insert
 Q_SIGNALS:
     void beforeRendering();
     /*!

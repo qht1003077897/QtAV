@@ -56,7 +56,9 @@ public:
     {
     }
     ~OpenGLVideoPrivate() {
+         qDebug("QHT ~OpenGLVideoPrivate()");
         if (material) {
+            qDebug("QHT ~OpenGLVideoPrivate::delete material");
             delete material;
             material = 0;
         }
@@ -67,8 +69,7 @@ public:
 #endif
     }
 
-    void resetGL() {
-        ctx = 0;
+    void resetGL() {  
         if (gr)
             gr->updateGeometry(NULL);
         if (!manager)
@@ -77,9 +78,11 @@ public:
         delete manager;
         manager = 0;
         if (material) {
+            qDebug("QHT OpenGLVideoPrivate resetGL::delete material");
             delete material;
             material = 0;
         }
+        ctx = 0;
     }
     void setVertexData(float *arrayVdata, int arrayVdataSize)
     {
@@ -204,6 +207,11 @@ OpenGLVideo::OpenGLVideo() {
 #endif
 }
 
+OpenGLVideo::~OpenGLVideo()
+{
+     qDebug("QHT ~OpenGLVideo() 1");
+}
+
 bool OpenGLVideo::isSupported(VideoFormat::PixelFormat pixfmt)
 {
     return pixfmt != VideoFormat::Format_RGB48BE && pixfmt != VideoFormat::Format_Invalid;
@@ -220,6 +228,7 @@ void OpenGLVideo::setOpenGLContext(QOpenGLContext *ctx)
         c = d.material->contrast();
         h = d.material->hue();
         s = d.material->saturation();
+        qDebug("QHT OpenGLVideo::setOpenGLContext::delete material");
         delete d.material;
         d.material = 0;
     }
@@ -242,17 +251,20 @@ void OpenGLVideo::setOpenGLContext(QOpenGLContext *ctx)
     // TODO: what if ctx is delete?
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     d.manager = new ShaderManager(ctx);
-    QObject::connect(ctx, &QOpenGLContext::aboutToBeDestroyed, this,[this,ctx] {
-            qDebug("QHT aboutToBeDestroyed resetGL begin");
-            QOffscreenSurface s;
-            s.create();
-            ctx->makeCurrent(&s);
-            d_func().resetGL();
-            resetGL();// it's better to cleanup gl renderer resources
-            ctx->doneCurrent();
-            qDebug("QHT aboutToBeDestroyed resetGL end");
-        }, Qt::DirectConnection);
-    //QObject::connect(ctx, SIGNAL(aboutToBeDestroyed()), this, SLOT(resetGL()), Qt::DirectConnection); // direct to make sure there is a valid context. makeCurrent in window.aboutToBeDestroyed()?
+    qDebug("QObject::connect(ctx, &QOpenGLContext::aboutToBeDestroyed  resetGL");
+//    QObject::connect(ctx, &QOpenGLContext::aboutToBeDestroyed,[this,ctx] {
+//            qWarning("QHT aboutToBeDestroyed resetGL begin");
+//            qWarning("QHT ----------------------1");
+//            QOffscreenSurface s;
+//            s.create();
+//            ctx->makeCurrent(&s);
+//            qWarning("QHT ----------------------1.5");
+//            resetGL();
+//            ctx->doneCurrent();
+//            qWarning("QHT ----------------------2");
+//            qWarning("QHT aboutToBeDestroyed resetGL end");
+//        });
+    //QObject::connect(QOpenGLContext::currentContext(), SIGNAL(aboutToBeDestroyed()), this, SLOT(resetGL()), Qt::DirectConnection); // direct to make sure there is a valid context. makeCurrent in window.aboutToBeDestroyed()?
 #else
     d.manager = new ShaderManager(this);
 #endif
@@ -381,6 +393,11 @@ void OpenGLVideo::setVertexData(float *arrayVdata, int arrayVdataSize)
     d_func().setVertexData(arrayVdata,arrayVdataSize);
 }
 
+void OpenGLVideo::deleteTextures()
+{
+     d_func().material->deleteTextures();
+}
+
 void OpenGLVideo::fill(const QColor &color)
 {
     DYGL(glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF()));
@@ -426,7 +443,7 @@ void OpenGLVideo::render(const QRectF &target, const QRectF& roi, const QMatrix4
 
 void OpenGLVideo::resetGL()
 {
-    qDebug("~~~~~~~~~resetGL %p. from sender %p", d_func().manager, sender());
+    qWarning("~~~~~~~~~resetGL %p. from sender %p", d_func().manager, sender());
     d_func().resetGL();
 }
 
