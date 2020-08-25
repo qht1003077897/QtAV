@@ -49,6 +49,7 @@ extern "C" {
 #include <libavutil/mathematics.h>
 }
 #include<QDebug>
+#include<thread>
 #define EOF_ISSUE_SOLVED 0
 namespace QtAV {
 namespace {
@@ -1233,36 +1234,54 @@ void AVPlayer::play()
 
 void AVPlayer::playInternal()
 {
-    {
-    QMutexLocker lock(&d->load_mutex);
-    Q_UNUSED(lock);
-    if (!d->demuxer.isLoaded())
-        return;
-    d->start_position_norm = normalizedPosition(d->start_position);
-    d->stop_position_norm = normalizedPosition(d->stop_position);
-    // FIXME: if call play() frequently playInternal may not be called if disconnect here
+    connect(this,SIGNAL(openDecodecFinish()),this,SLOT(slotopenDecodecFinish()),Qt::QueuedConnection);
     disconnect(this, SIGNAL(loaded()), this, SLOT(playInternal()));
-    if (!d->setupAudioThread(this)) {
-        d->read_thread->setAudioThread(0); //set 0 before delete. ptr is used in demux thread when set 0
-        if (d->athread) {
-            qDebug("release audio thread.");
-            delete d->athread;
-            d->athread = 0;//shared ptr?
+        QMutexLocker lock(&d->load_mutex);
+        Q_UNUSED(lock);
+        if (!d->demuxer.isLoaded())
+            return;
+        d->start_position_norm = normalizedPosition(d->start_position);
+        d->stop_position_norm = normalizedPosition(d->stop_position);
+        // FIXME: if call play() frequently playInternal may not be called if disconnect here
+        qDebug() << "QHT AVPlayer::playInternal,setupVideoThread cusumeTime begin:" << QDateTime::currentDateTime().toMSecsSinceEpoch();
+        if (!d->setupVideoThread(this)) {
+           d->read_thread->setVideoThread(0); //set 0 before delete. ptr is used in demux thread when set 0
+           if (d->vthread) {
+               qDebug("release video thread.");
+               delete d->vthread;
+               d->vthread = 0;//shared ptr?
+           }
         }
-    }
-    if (!d->setupVideoThread(this)) {
-        d->read_thread->setVideoThread(0); //set 0 before delete. ptr is used in demux thread when set 0
-        if (d->vthread) {
-            qDebug("release video thread.");
-            delete d->vthread;
-            d->vthread = 0;//shared ptr?
-        }
-    }
-    if (!d->athread && !d->vthread) {
+        qDebug() << "QHT AVPlayer::playInternal,setupVideoThread cusumeTime end:" << QDateTime::currentDateTime().toMSecsSinceEpoch();
+        std::thread t([this]()
+             {
+                qDebug() << "QHT AVPlayer::playInternal,setupAudioThread cusumeTime begin:" << QDateTime::currentDateTime().toMSecsSinceEpoch();
+                if (!d->setupAudioThread(this))
+                {
+                    d->read_thread->setAudioThread(0); //set 0 before delete. ptr is used in demux thread when set 0
+                    if (d->athread) {
+                        qDebug("release audio thread.");
+                        delete d->athread;
+                        d->athread = 0;//shared ptr?
+                    }
+                 }
+                qDebug() << "QHT AVPlayer::playInternal,setupAudioThread cusumeTime end:" << QDateTime::currentDateTime().toMSecsSinceEpoch();
+                Q_EMIT openDecodecFinish();
+            });
+            t.detach();
+}
+
+void AVPlayer::slotopenDecodecFinish()
+{    
+    qDebug("QHT AVPlayer::slotopenDecodecFinish");
+    disconnect(this,SIGNAL(openDecodecFinish()),this,SLOT(slotopenDecodecFinish()));
+    //QHT video 不允许缺失  audio 允许缺失
+    if (!d->vthread) {
         d->loaded = false;
-        qWarning("load failed");
+        qWarning("QHT AVPlayer::slotopenDecodecFinish load Video failed");
         return;
     }
+    {
     // setup clock before avthread.start() becuase avthreads use clock. after avthreads setup because of ao check
     masterClock()->reset();
     // TODO: add isVideo() or hasVideo()?
@@ -1277,7 +1296,7 @@ void AVPlayer::playInternal()
         }
     }
     masterClock()->setInitialValue((double)absoluteMediaStartPosition()/1000.0);
-    // from previous play()
+//    // from previous play()
     if (d->demuxer.audioCodecContext() && d->athread) {
         qDebug("Starting audio thread...");
         d->athread->start();
@@ -1311,7 +1330,7 @@ void AVPlayer::playInternal()
         else
             setPosition((qint64)(d->start_position_norm));
     }
-    
+
     d->was_stepping = false;
 
     Q_EMIT stateChanged(PlayingState);
@@ -1764,5 +1783,6 @@ void AVPlayer::setSaturation(int val)
         d->vthread->setSaturation(val);
     }
 }
+
 
 } //namespace QtAV

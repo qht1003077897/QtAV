@@ -544,6 +544,7 @@ public Q_SLOTS:
     void setSaturation(int val);
 
 Q_SIGNALS:
+    void openDecodecFinish();
     void bufferProgressChanged(qreal);
     void relativeTimeModeChanged();
     void autoLoadChanged();
@@ -610,6 +611,7 @@ Q_SIGNALS:
     void internalSubtitleHeaderRead(const QByteArray& codec, const QByteArray& data);
     void internalSubtitlePacketRead(int track, const QtAV::Packet& packet);
 private Q_SLOTS:
+    void slotopenDecodecFinish();
     void loadInternal(); // simply load
     void playInternal(); // simply play
     void stopFromDemuxerThread();
