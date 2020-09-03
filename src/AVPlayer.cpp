@@ -1275,10 +1275,9 @@ void AVPlayer::slotopenDecodecFinish()
 {    
     qDebug("QHT AVPlayer::slotopenDecodecFinish");
     disconnect(this,SIGNAL(openDecodecFinish()),this,SLOT(slotopenDecodecFinish()));
-    //QHT video 不允许缺失  audio 允许缺失
-    if (!d->vthread) {
+    if (!d->vthread && !d->athread) {
         d->loaded = false;
-        qWarning("QHT AVPlayer::slotopenDecodecFinish load Video failed");
+        qWarning("QHT AVPlayer::slotopenDecodecFinish load failed");
         return;
     }
     {
