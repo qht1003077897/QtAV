@@ -32,13 +32,13 @@ exists($$PROJECTROOT/extra/qtLongName(include)): INCLUDEPATH += $$PROJECTROOT/ex
 exists($$PROJECTROOT/extra/qtLongName(lib)): LIBS += -L$$PROJECTROOT/extra/qtLongName(lib)
 staticlib: DEFINES += BUILD_QTAV_STATIC
 
-config_uchardet {
-  DEFINES += LINK_UCHARDET
-  LIBS *= -luchardet
-} else:exists($$PROJECTROOT/contrib/uchardet/src/uchardet.h) {
-  include($$PROJECTROOT/contrib/uchardet.pri)
-  DEFINES += BUILD_UCHARDET
-}
+#config_uchardet {
+#  DEFINES += LINK_UCHARDET
+#  LIBS *= -luchardet
+#} else:exists($$PROJECTROOT/contrib/uchardet/src/uchardet.h) {
+#  include($$PROJECTROOT/contrib/uchardet.pri)
+#  DEFINES += BUILD_UCHARDET
+#}
 exists($$PROJECTROOT/contrib/capi/capi.pri) {
   include($$PROJECTROOT/contrib/capi/capi.pri)
   DEFINES *= QTAV_HAVE_CAPI=1
@@ -660,7 +660,6 @@ MODULE_VERSION = $$VERSION
 # windows: Qt5AV.dll, not Qt1AV.dll
 !mac_framework: MODULE_VERSION = $${QT_MAJOR_VERSION}.$${QT_MINOR_VERSION}.$${QT_PATCH_VERSION}
 !contains(QMAKE_HOST.os, Windows):include($$PROJECTROOT/deploy.pri)
-<<<<<<< HEAD
 unix:!mac{
     # suppress the default RPATH if you wish
     QMAKE_LFLAGS_RPATH=

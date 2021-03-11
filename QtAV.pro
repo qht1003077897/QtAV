@@ -54,7 +54,7 @@ contains(QT_CONFIG, opengl):!no-gl:!no-widgets {
 # no-xxx can set in $$PWD/user.conf
 !no-openal:!mac:!ios: OptionalDepends *= openal #FIXME: ios openal header not found in qtCompileTest but fine if manually make
 !no-libass: OptionalDepends *= libass
-!no-uchardet: OptionalDepends *= uchardet
+#!no-uchardet: OptionalDepends *= uchardet
 win32:macx:!android:!winrt:!no-portaudio: OptionalDepends *= portaudio
 win32 {
   OptionalDepends *= dx
